@@ -1,0 +1,46 @@
+trainer:
+  name: lipizzaner_gan
+  n_iterations: 2
+  calculate_net_weights_dist: True
+  # independent_probability, exact_proportion
+  mixture_generator_samples_mode: exact_proportion
+  params:
+    population_size: 1
+    tournament_size: 1
+    n_replacements: 1
+    default_adam_learning_rate: DEFAULT_ADAM_LEARNING_RATE
+    # Hyperparameter mutation
+    alpha: 0.0001
+    mutation_probability: MUTATION_PROBABILITY
+    discriminator_skip_each_nth_step: 1
+    mixture_sigma: 0.01
+    enable_selection: True
+    evaluate_subpopulations_every: 10
+    subpopulation_sample_size: 1
+    score:
+      enabled: False
+      type: inception_score
+      score_sample_size: 1000
+      cuda: True
+    fitness:
+      fitness_sample_size: 1000
+      fitness_mode: average    # worse, best, average
+      fitness_batch_size: 50
+dataloader:
+  dataset_name: covid
+  use_batch: True
+  batch_size: BATCH_SIZE
+  n_batches: 3
+  shuffle: True
+  smote_augmentation_times: SMOTE_AUGMENTATION_TIMES
+  gaussian_augmentation_times: 0
+  gaussian_augmentation_mean: 0
+  gaussian_augmentation_std: 0
+network:
+  name: NETWORK_NAME
+  loss: bceloss
+master:
+  calculate_score: True
+  score_sample_size: 150
+  cuda: True
+general: !include lipizzaner-general-config.yml

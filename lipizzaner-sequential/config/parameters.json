@@ -1,0 +1,17 @@
+{
+  "lipizzaner_path": "/home/mesteban/git/lipizzaner-covidgan/src/main.py",
+  "grid_size": 1,
+  "n_executions": 1,
+
+  "lipizzaner_config": {
+    "specific":{
+      "networks":["five_layer_perceptron"],
+      "batch_sizes":[50],
+      "smote_sizes":[50],
+      "mutations_probabilities":[0.5],
+      "adam_rates":[0.00025]
+    }
+  }
+
+
+}
