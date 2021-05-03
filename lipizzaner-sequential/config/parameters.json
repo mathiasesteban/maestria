@@ -1,17 +1,52 @@
 {
-  "lipizzaner_path": "/home/mesteban/git/lipizzaner-covidgan/src/main.py",
-  "grid_size": 1,
+  
   "n_executions": 1,
+  "grid_size": 1,
+  
+  "trainer_name": ["lipizzaner_gan"],
+  "trainer_n_iterations": ["2"],
 
-  "lipizzaner_config": {
-    "specific":{
-      "networks":["five_layer_perceptron"],
-      "batch_sizes":[50],
-      "smote_sizes":[50],
-      "mutations_probabilities":[0.5],
-      "adam_rates":[0.00025]
-    }
-  }
+  "trainer_calculate_net_weights_dist": ["True"],
+  "trainer_mixture_generator_samples_mode": ["exact_proportion"],
 
 
+  "trainer_params_population_size": ["1"],
+  "trainer_params_tournament_size": ["1"],
+  "trainer_params_n_replacements": ["1"],
+  "trainer_params_default_adam_learning_rate": ["0.0001"],
+  "trainer_params_alpha": ["0.0001"],
+  "trainer_params_mutation_probability": ["0.5"],
+  "trainer_params_discriminator_skip_each_nth_step": ["1"],
+  "trainer_params_mixture_sigma": ["0.01"],
+  "trainer_params_enable_selection": ["True"],
+  "trainer_params_evaluate_subpopulations_every": ["10"],
+  "trainer_params_subpopulation_sample_size": ["1"],
+
+
+  "trainer_params_score_enabled": ["False"],
+  "trainer_params_score_type": ["fid"],
+  "trainer_params_score_score_sample_size": ["1000"],
+  "trainer_params_score_cuda": ["False"],
+
+
+  "trainer_params_fitness_fitness_sample_size": ["1000"],
+  "trainer_params_fitness_fitness_mode": ["average"],
+  "trainer_params_fitness_fitness_batch_size": ["50"],
+
+  "dataloader_dataset_name": ["mnist"],
+  "dataloader_use_batch": ["True"], 
+  "dataloader_batch_size": ["32"], 
+  "dataloader_n_batches": ["0"], 
+  "dataloader_shuffle": ["True"], 
+  "dataloader_smote_augmentation_times": ["0"], 
+  "dataloader_gaussian_augmentation_times": ["0"], 
+  "dataloader_gaussian_augmentation_mean": ["0"], 
+  "dataloader_gaussian_augmentation_std": ["0"], 
+
+  "network_name": ["five_layer_perceptron"],
+  "network_loss": ["bceloss"],
+
+  "master_calculate_score": ["True"],
+  "master_score_sample_size": ["50000"],
+  "master_cuda": ["False"]
 }

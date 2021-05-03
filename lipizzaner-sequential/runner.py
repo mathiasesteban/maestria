@@ -1,9 +1,11 @@
 import subprocess
 import re
 import time
+import pathlib
 
-
-def run(config, experiment_instances):
+def run(grid_size, experiment_instances):
+    
+    lipizzaner_path = str(pathlib.Path(__file__).parent.absolute()) + "/../lipizzaner/src/main.py"
 
     experiment_results = []
 
@@ -14,24 +16,20 @@ def run(config, experiment_instances):
 
         # Launch clients
         clients_pool = []
+        for j in range(grid_size):
 
-        for j in range(config["grid_size"]):
-            client_command = ["python", config["lipizzaner_path"], "train", "--distributed", "--client"]
+            client_command = ["python", lipizzaner_path, "train", "--distributed", "--client"]
 
             # Important to send output to DEVNULL in order to not populate SLURM file in ClusterUY.
-            # Output info is logged by Lipizzaner.
+            # Output is logged by Lipizzaner.
             lipizzaner_client = subprocess.Popen(client_command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             clients_pool.append(lipizzaner_client)
+            
             # Important to wait for clients before initializing master
-            time.sleep(60)
+            time.sleep(30)
 
         # Launch master
-        master_command = ["python",
-                          config["lipizzaner_path"],
-                          "train",
-                          "--distributed",
-                          "--master",
-                          "-f", instance["dir"] + "/lipizzaner-main-config.yml"]
+        master_command = ["python", lipizzaner_path, "train", "--distributed", "--master", "-f", instance["dir"] + "/main.yml"]
 
         lipizzaner_master = subprocess.run(master_command,
                                            stdout=subprocess.PIPE,
@@ -41,42 +39,36 @@ def run(config, experiment_instances):
         end = time.time()
         wall_clock = end - start
 
-        # Save master output for easy access
-        master_stderr = open(instance["dir"] + "/master_stderr.log", "wt")
-        master_stderr.write(str(lipizzaner_master.stderr))
-        master_stderr.close()
-
         # Kill clients
         for client in clients_pool:
             client.kill()
 
-        # Search FID
+        # Search score
         if lipizzaner_master.returncode != 0:
-            fid = "Non-cero exit code ({})".format(lipizzaner_master.returncode)
+            score = "Non-cero exit code ({})".format(lipizzaner_master.returncode)
         else:
             match = re.search('Best result:.* = \((.*), (.*)\)', lipizzaner_master.stderr)
             if match is None:
-                fid = "not found"
+                score = "not found"
             else:
-                fid = match.group(1)
+                score = match.group(1)
 
         instance_result = {
             "timestamp":  instance["timestamp"],
-            "config": instance["config"],
-            "exec": instance["exec"],
+            "config_id": instance["config_id"],
+            "exec_id": instance["exec_id"],
             "wall_clock": wall_clock,
-            "fid": fid
+            "score": score
         }
 
-        result_line = "{}-C{}E{}: {} ({})".format(instance_result["timestamp"],
-                                                                 instance_result["config"],
-                                                                 instance_result["exec"],
-                                                                 instance_result["fid"],
-                                                                 instance_result["wall_clock"])
-
-        # In order to see instance results in SLURM file before the experiment finishes
-        print(result_line)
 
         experiment_results.append(instance_result)
+
+        result_line = "{}-C{}E{}: {} ({})\n".format(instance_result["timestamp"],
+                                                    instance_result["config_id"],
+                                                    instance_result["exec_id"],
+                                                    instance_result["score"],
+                                                    instance_result["wall_clock"])
+        print(result_line)                                            
 
     return experiment_results
