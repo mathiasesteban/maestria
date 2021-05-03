@@ -1,4 +1,5 @@
 import os
+import pathlib
 
 from torchvision import transforms
 
@@ -34,7 +35,10 @@ class ScoreCalculatorFactory:
             if cc.settings['dataloader']['dataset_name'] != 'mnist':
                 # Need to reshape for RGB dataset as required by pre-trained InceptionV3
                 transforms_op = [transforms.Resize([64, 64])] + transforms_op
-            dataset = dataloader.dataset(root=os.path.join(cc.settings['general']['output_dir'], 'data'), train=True,
+
+            dataset_path = str(pathlib.Path(__file__).parent.absolute()) + "/../../data/datasets/" + cc.settings['dataloader']['dataset_name']    
+
+            dataset = dataloader.dataset(root=dataset_path, train=True,
                                          transform=transforms.Compose(transforms_op))
 
             return FIDCalculator(IgnoreLabelDataset(dataset), cuda=cc.settings['master'].get('cuda', False),

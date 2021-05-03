@@ -12,7 +12,7 @@ from helpers.pytorch_helpers import denorm
 from torch.utils.data import Sampler, SubsetRandomSampler
 from helpers.reproducible_helpers import set_random_seed
 import random
-
+import pathlib
 class DataLoader(ABC):
     """
     Abstract base class for all dataloaders, cannot be instanced.
@@ -41,8 +41,11 @@ class DataLoader(ABC):
     def load(self):
         # Image processing
 
+        # Set dataset path inside Lipizzaner dir.
+        dataset_path = str(pathlib.Path(__file__).parent.absolute()) + "/datasets/" + self.cc.settings['dataloader']['dataset_name']
+
         # Dataset
-        dataset = self.dataset(root=os.path.join(self.cc.settings['general']['output_dir'], 'data'),
+        dataset = self.dataset(root= dataset_path,
                                train=True,
                                transform=self.transform(),
                                download=True)
