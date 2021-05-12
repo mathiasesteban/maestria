@@ -1,0 +1,62 @@
+# Trainer
+trainer:
+
+  name: TRAINER_NAME
+  n_iterations: TRAINER_N_ITERATIONS
+  
+  calculate_net_weights_dist: TRAINER_CALCULATE_NET_WEIGHTS_DIST
+  mixture_generator_samples_mode: TRAINER_MIXTURE_GENERATOR_SAMPLES_MODE
+
+  params:
+
+    # GA Population
+    population_size: TRAINER_PARAMS_POPULATION_SIZE
+    tournament_size: TRAINER_PARAMS_TOURNAMENT_SIZE
+    n_replacements: TRAINER_PARAMS_N_REPLACEMENTS
+    default_adam_learning_rate: TRAINER_PARAMS_DEFAULT_ADAM_LEARNING_RATE
+    
+    # Hyperparameter mutation
+    alpha: TRAINER_PARAMS_ALPHA
+    mutation_probability: TRAINER_PARAMS_MUTATION_PROBABILITY
+    discriminator_skip_each_nth_step: TRAINER_PARAMS_DISCRIMINATOR_SKIP_EACH_NTH_STEP
+    mixture_sigma: TRAINER_PARAMS_MIXTURE_SIGMA
+    enable_selection: TRAINER_PARAMS_ENABLE_SELECTION
+    evaluate_subpopulations_every: TRAINER_PARAMS_EVALUATE_SUBPOPULATIONS_EVERY
+    subpopulation_sample_size: TRAINER_PARAMS_SUBPOPULATION_SAMPLE_SIZE
+    
+    # Training score
+    score:
+      enabled: TRAINER_PARAMS_SCORE_ENABLED
+      type: TRAINER_PARAMS_SCORE_TYPE
+      score_sample_size: TRAINER_PARAMS_SCORE_SCORE_SAMPLE_SIZE
+      cuda: TRAINER_PARAMS_SCORE_CUDA
+
+    # Training fitness  
+    fitness:
+      fitness_sample_size: TRAINER_PARAMS_FITNESS_FITNESS_SAMPLE_SIZE
+      fitness_mode: TRAINER_PARAMS_FITNESS_FITNESS_MODE
+      fitness_batch_size: TRAINER_PARAMS_FITNESS_FITNESS_BATCH_SIZE
+
+# Data     
+dataloader:
+  dataset_name: DATALOADER_DATASET_NAME
+  use_batch: DATALOADER_USE_BATCH
+  batch_size: DATALOADER_BATCH_SIZE
+  n_batches: DATALOADER_N_BATCHES
+  shuffle: DATALOADER_SHUFFLE
+  smote_augmentation_times: DATALOADER_SMOTE_AUGMENTATION_TIMES
+  gaussian_augmentation_times: DATALOADER_GAUSSIAN_AUGMENTATION_TIMES
+  gaussian_augmentation_mean: DATALOADER_GAUSSIAN_AUGMENTATION_MEAN
+  gaussian_augmentation_std: DATALOADER_GAUSSIAN_AUGMENTATION_STD
+
+# Networks  
+network:
+  name: NETWORK_NAME
+  loss: NETWORK_LOSS
+master:
+  calculate_score: MASTER_CALCULATE_SCORE
+  score_sample_size: MASTER_SCORE_SAMPLE_SIZE
+  cuda: MASTER_CUDA
+
+# General file  
+general: !include general.yml

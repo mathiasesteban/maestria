@@ -1,10 +1,10 @@
 {
   
-  "n_executions": 1,
+  "is_maximization": false,
   "grid_size": 1,
   
   "trainer_name": ["lipizzaner_gan"],
-  "trainer_n_iterations": ["100"],
+  "trainer_n_iterations": ["200"],
 
   "trainer_calculate_net_weights_dist": ["True"],
   "trainer_mixture_generator_samples_mode": ["exact_proportion"],
@@ -23,7 +23,7 @@
   "trainer_params_subpopulation_sample_size": ["1"],
 
 
-  "trainer_params_score_enabled": ["False"],
+  "trainer_params_score_enabled": ["True"],
   "trainer_params_score_type": ["fid"],
   "trainer_params_score_score_sample_size": ["1000"],
   "trainer_params_score_cuda": ["False"],
@@ -35,7 +35,7 @@
 
   "dataloader_dataset_name": ["mnist"],
   "dataloader_use_batch": ["True"], 
-  "dataloader_batch_size": ["400"], 
+  "dataloader_batch_size": ["200"], 
   "dataloader_n_batches": ["0"], 
   "dataloader_shuffle": ["True"], 
   "dataloader_smote_augmentation_times": ["0"], 
@@ -47,6 +47,7 @@
   "network_loss": ["bceloss"],
 
   "master_calculate_score": ["True"],
-  "master_score_sample_size": ["5000"],
+  "master_score_sample_size": ["50000"],
   "master_cuda": ["False"]
+
 }

@@ -33,8 +33,7 @@
 #mutation        "--mutation="        o  ("none", "very low", "low", "medium", "high", "very high", "all")
 #unused         "-u "                c  (1, 2, 10, 20)
 
-batch_size "--batch_size " c (50,100)
-network "--network " c (five_layer_perceptron)
-smote_size "--smote_size " c (50,75,100)
-mutation_probabilitie "--mutation_probabilitie " r (0.3,0.5)
-adam_rate "--adam_rate " r (0.00025, 0.00050)
+trainer_params_alpha "--trainer_params_alpha " r (0.00001,0.001)
+trainer_params_default_adam_learning_rate "--trainer_params_default_adam_learning_rate " r (0.000001,0.1)
+trainer_params_mutation_probability "--trainer_params_mutation_probability " r (0.1,0.5)
+trainer_params_discriminator_skip_each_nth_step "--trainer_params_discriminator_skip_each_nth_step " c (0,1,2)

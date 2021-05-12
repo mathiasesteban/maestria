@@ -16,4 +16,4 @@ distribution:
     - address: 127.0.0.1 # Fill in IP address here
       port: PORTS
 seed: 1
-num_workers: 0    # how many subprocesses to use for data loading
+num_workers: 0    # How many subprocesses to use for data loading
