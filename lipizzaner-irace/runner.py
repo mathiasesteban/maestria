@@ -141,7 +141,7 @@ def train_lipizzaner(grid_size, instance_path, lipizzaner_path):
     clients_pool = []
     for i in range(grid_size):
         client_command = ["python", lipizzaner_path, "train", "--distributed", "--client"]
-        lipizzaner_client = subprocess.Popen(client_command,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        lipizzaner_client = subprocess.Popen(client_command,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         clients_pool.append(lipizzaner_client)
         # Wait to initialize next clients and master process.
         time.sleep(30)

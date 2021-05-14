@@ -4,7 +4,7 @@
   "grid_size": 1,
   
   "trainer_name": ["lipizzaner_gan"],
-  "trainer_n_iterations": ["200"],
+  "trainer_n_iterations": ["5"],
 
   "trainer_calculate_net_weights_dist": ["True"],
   "trainer_mixture_generator_samples_mode": ["exact_proportion"],
