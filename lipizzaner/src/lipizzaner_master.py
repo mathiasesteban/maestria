@@ -94,6 +94,10 @@ class LipizzanerMaster:
         for client in clients:
             assert client['address'] is not None
             address = 'http://{}:{}/status'.format(client['address'], client['port'])
+            print("******************************")
+            print("LAUNCHING AT: {}".format(address))
+            print("******************************")
+
             try:
                 resp = requests.get(address)
                 assert resp.status_code == 200
@@ -129,6 +133,8 @@ class LipizzanerMaster:
 
         for client_id, client in enumerate(self.cc.settings['general']['distribution']['client_nodes']):
             address = 'http://{}:{}/experiments'.format(client['address'], client['port'])
+
+
             self.cc.settings['general']['distribution']['client_id'] = client_id
             try:
                 resp = requests.post(address, json=self.cc.settings)

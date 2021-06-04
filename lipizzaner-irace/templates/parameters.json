@@ -2,7 +2,10 @@
   
   "is_maximization": false,
   "grid_size": 1,
-  
+  "min_port": 5000,
+  "max_port": 5001,
+  "required_mem": 2500,
+
   "trainer_name": ["lipizzaner_gan"],
   "trainer_n_iterations": ["5"],
 
@@ -26,7 +29,7 @@
   "trainer_params_score_enabled": ["True"],
   "trainer_params_score_type": ["fid"],
   "trainer_params_score_score_sample_size": ["1000"],
-  "trainer_params_score_cuda": ["False"],
+  "trainer_params_score_cuda": ["True"],
 
 
   "trainer_params_fitness_fitness_sample_size": ["1000"],
@@ -35,7 +38,7 @@
 
   "dataloader_dataset_name": ["mnist"],
   "dataloader_use_batch": ["True"], 
-  "dataloader_batch_size": ["200"], 
+  "dataloader_batch_size": ["400"], 
   "dataloader_n_batches": ["0"], 
   "dataloader_shuffle": ["True"], 
   "dataloader_smote_augmentation_times": ["0"], 
@@ -48,6 +51,6 @@
 
   "master_calculate_score": ["True"],
   "master_score_sample_size": ["50000"],
-  "master_cuda": ["False"]
+  "master_cuda": ["True"]
 
 }

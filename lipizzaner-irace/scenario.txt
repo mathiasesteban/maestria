@@ -43,7 +43,7 @@ trainInstancesFile = "./config/instances.txt"
 
 ## Script called for each configuration that executes the target algorithm
 ## to be tuned. See templates.
-targetRunner = "./runner.py"
+targetRunner = "./runnerParallel.py"
 
 ## Number of times to retry a call to targetRunner if the call failed.
 # targetRunnerRetries = 0
@@ -63,7 +63,7 @@ targetRunner = "./runner.py"
 ## Maximum number of runs (invocations of targetRunner) that will be
 ## performed. It determines the maximum budget of experiments for the
 ## tuning.
-maxExperiments = 5
+maxExperiments = 200
 
 ## Maximum total execution time in seconds for the executions of
 ## targetRunner. targetRunner must return two values: cost and time.
@@ -171,7 +171,7 @@ maxExperiments = 5
 # testIterationElites = 0
 
 ## Enable/disable elitist irace.
-elitist = 0
+elitist = 1
 
 ## Number of instances added to the execution list before previous
 ## instances in elitist irace.

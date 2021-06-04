@@ -255,6 +255,7 @@ if __name__ == '__main__':
                 initialize_settings(args)
                 LipizzanerMaster().run()
             elif args.client:
+                initialize_settings(args)
                 LipizzanerClient().run()
         else:
             cc = initialize_settings(args)
