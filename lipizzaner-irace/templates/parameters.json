@@ -50,7 +50,7 @@
   "network_loss": ["bceloss"],
 
   "master_calculate_score": ["True"],
-  "master_score_sample_size": ["50000"],
+  "master_score_sample_size": ["5000"],
   "master_cuda": ["True"]
 
 }
