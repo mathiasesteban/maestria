@@ -8,17 +8,11 @@ import pathlib
 import time
 import json
 import itertools
-import random
-import filelock
-import pickle
 
 from datetime import datetime
 
-from control import ExecutionControl
 
-
-def prepare(workdir, experiment_path, ports, parameters):
-
+def prepare(workdir, experiment_path, parameters):
     # Read parameters candidates.
     params = []
     params.append(parameters["trainer_name"])
@@ -63,8 +57,8 @@ def prepare(workdir, experiment_path, ports, parameters):
     configs = list(itertools.product(*params))
     config = configs[0]
 
-    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S.%f')[:-3]
-    
+    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+
     # Create instance dir
     instance_dir = experiment_path + "/{}".format(timestamp)
     os.mkdir(instance_dir)
@@ -74,14 +68,11 @@ def prepare(workdir, experiment_path, ports, parameters):
     general_config = open(instance_dir + "/general.yml", "wt")
 
     # Find required ports: start at 5000
-    #if parameters["grid_size"] == 1:
-     #   ports = "5000"
-    #else:
-     #   max_port = 4999 + parameters["grid_size"]
-      #  ports = "5000-" + str(max_port)
-
-    #port = random.randint(1, 50)
-    #ports = str(5000 + port)
+    if parameters["grid_size"] == 1:
+        ports = "5000"
+    else:
+        max_port = 4999 + parameters["grid_size"]
+        ports = "5000-" + str(max_port)
 
     for line in general_config_template:
         newline = line.replace('OUTPUT_DIR', instance_dir)
@@ -142,25 +133,27 @@ def prepare(workdir, experiment_path, ports, parameters):
     return instance_dir
 
 
-
 def train_lipizzaner(grid_size, instance_path, lipizzaner_path):
-
     # Launch Lipizzaner clients: Popen continues execution
     clients_pool = []
     for i in range(grid_size):
-        client_command = ["python", lipizzaner_path, "train", "--distributed", "--client", "-f", instance_path + "/main.yml"]
-        lipizzaner_client = subprocess.Popen(client_command,stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        client_command = ["python", lipizzaner_path, "train", "--distributed", "--client"]
+        lipizzaner_client = subprocess.Popen(client_command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         clients_pool.append(lipizzaner_client)
         # Wait to initialize next clients and master process.
         time.sleep(30)
 
     # Launch Lipizzaner master: Run waits for the command to finish
-    master_command = ["python", lipizzaner_path, "train", "--distributed", "--master", "-f", instance_path + "/main.yml"]
-    lipizzaner_master = subprocess.run(master_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    master_command = ["python", lipizzaner_path, "train", "--distributed", "--master", "-f",
+                      instance_path + "/main.yml"]
+    lipizzaner_master = subprocess.run(master_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                       universal_newlines=True)
 
     # Kill clients
     for client in clients_pool:
         client.kill()
+
+    print()
 
     # Parse score
     match = re.search('Best result:.* = \((.*), (.*)\)', lipizzaner_master.stderr)
@@ -179,7 +172,11 @@ if __name__ == "__main__":
     lipizzaner_path = str(pathlib.Path(__file__).parent.absolute()) + "/../lipizzaner/src/main.py"
 
     # Create output folder
+    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
     experiment_path = workdir + "/../results/irace"
+
+    if not os.path.exists(experiment_path):
+        os.makedirs(experiment_path)
 
     # Get Lipizzaner parameters file
     parameters_file = open(str(workdir) + "/templates/parameters.json", 'r')
@@ -194,7 +191,7 @@ if __name__ == "__main__":
 
     # Parse parameters
     while cand_params:
-        
+
         # Get and remove first and second elements.
         param = cand_params.pop(0)
         value = cand_params.pop(0)
@@ -205,10 +202,10 @@ if __name__ == "__main__":
 
         elif param == "--trainer_params_default_adam_learning_rate":
             parameters["trainer_params_default_adam_learning_rate"] = [value]
-        
+
         elif param == "--trainer_params_mutation_probability":
             parameters["trainer_params_mutation_probability"] = [value]
-        
+
         elif param == "--trainer_params_discriminator_skip_each_nth_step":
             parameters["trainer_params_discriminator_skip_each_nth_step"] = [value]
 
@@ -216,107 +213,24 @@ if __name__ == "__main__":
             print("Unknown parameter %s" % param)
             sys.exit(1)
 
-    execution_control_file_path = experiment_path + '/control.pkl'
-    my_pid = os.getpid()
-
-    # Check if control file exists
-    if not os.path.isfile(execution_control_file_path):
-
-        # Lock process to create control file
-        lock = filelock.FileLock("{}.lock".format(execution_control_file_path))
-        with lock.acquire():
-
-            # Check again after locking to avoid creating twice
-            if not os.path.isfile(execution_control_file_path):
-
-                execution_control = ExecutionControl(my_pid, parameters["min_port"], parameters["max_port"],
-                                                     parameters["grid_size"], parameters["required_mem"])
-
-                with open(execution_control_file_path, "wb+") as control_pkl:
-                    pickle.dump(execution_control, control_pkl)
-
-            lock.release()
-
-    # Add myself to queue
-    lock = filelock.FileLock("{}.lock".format(execution_control_file_path))
-    with lock.acquire():
-
-        with open(execution_control_file_path, "rb+") as execution_control_file:
-            execution_control = pickle.load(execution_control_file)
-            execution_control.add_to_queue(my_pid)
-
-        with open(execution_control_file_path, "rb+") as execution_control_file:
-            pickle.dump(execution_control, execution_control_file)
-
-        lock.release()
-
-    # Wait to launch
-    ready_to_launch = False
-    while not ready_to_launch:
-
-        random_sleep = random.randint(15, 30)
-        time.sleep(random_sleep)
-
-        lock = filelock.FileLock("{}.lock".format(execution_control_file_path))
-        with lock.acquire():
-
-            # Load controller
-            execution_control_file_read_stream = open(execution_control_file_path, "rb+")
-            execution_control = pickle.load(execution_control_file_read_stream)
-            execution_control_file_read_stream.close()
-
-            # Ask for permition
-            execution_resources = execution_control.is_my_turn(my_pid)
-
-            # Save controller
-            execution_control_file_write_stream = open(execution_control_file_path, "rb+")
-            pickle.dump(execution_control, execution_control_file_write_stream)
-            execution_control_file_write_stream.close()
-
-            if execution_resources is not None:
-                ready_to_launch = True
-
-            lock.release()
-
     # Prepare
-    instance_path = prepare(workdir, experiment_path, execution_resources["ports"],  parameters)
+    instance_path = prepare(workdir, experiment_path, parameters)
 
     # Execute
-    start_time = time.time()
     score = train_lipizzaner(parameters["grid_size"], instance_path, lipizzaner_path)
-    end_time = time.time()
-    wall_clock = end_time - start_time
 
     # Target runner must PRINT cost function.
     # IRACE minimizes cost function, if we have a positive score we should return the oposite to maximize it.
     # If the score is None we penalize this instance.
     if parameters["is_maximization"]:
         if score is None:
-            score = 999999
+            print(999999)
         else:
-            score = -1 * score
+            print(-1 * score)
     else:
         if score is None:
-            score = -999999
+            print(-999999)
+        else:
+            print(score)
 
-    # Free resources
-    lock = filelock.FileLock("{}.lock".format(execution_control_file_path))
 
-    with lock.acquire():
-
-        # Load controller
-        execution_control_file_read_stream = open(execution_control_file_path, "rb+")
-        execution_control = pickle.load(execution_control_file_read_stream)
-        execution_control_file_read_stream.close()
-
-        # Free resources
-        execution_control.free_resources(my_pid, score, wall_clock)
-
-        # Save controller
-        execution_control_file_write_stream = open(execution_control_file_path, "rb+")
-        pickle.dump(execution_control, execution_control_file_write_stream)
-        execution_control_file_write_stream.close()
-
-        lock.release()
-
-    print(score)
